@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package flowguard.ingestion.v1;
+
+option go_package = "flowguard/proto/ingestion";
+
+service IngestionGateway {
+  rpc PushSpans(PushSpansRequest) returns (PushSpansResponse);
+  rpc PushLogs(PushLogsRequest) returns (PushLogsResponse);
+  rpc PushMetrics(PushMetricsRequest) returns (PushMetricsResponse);
+  rpc GetSourceQuota(GetSourceQuotaRequest) returns (SourceQuota);
+}
+
+message PushSpansRequest {
+  string source_id = 1;
+  bytes otlp_payload = 2; // OTLP spans payload
+}
+
+message PushSpansResponse {
+  bool success = 1;
+  int32 accepted_spans = 2;
+  int32 dropped_spans = 3;
+}
+
+message PushLogsRequest {
+  string source_id = 1;
+  bytes otlp_payload = 2; // OTLP logs payload
+}
+
+message PushLogsResponse {
+  bool success = 1;
+  int32 accepted_logs = 2;
+  int32 dropped_logs = 3;
+}
+
+message PushMetricsRequest {
+  string source_id = 1;
+  bytes otlp_payload = 2; // OTLP metrics payload
+}
+
+message PushMetricsResponse {
+  bool success = 1;
+  int32 accepted_metrics = 2;
+  int32 dropped_metrics = 3;
+}
+
+message GetSourceQuotaRequest {
+  string source_id = 1;
+}
+
+message SourceQuota {
+  string source_id = 1;
+  int32 max_spans_per_minute = 2;
+  int32 max_logs_per_minute = 3;
+  int32 max_metrics_per_minute = 4;
+}

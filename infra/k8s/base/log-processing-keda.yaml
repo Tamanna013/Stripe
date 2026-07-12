@@ -1,0 +1,19 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: log-processing-service
+  namespace: flowguard
+spec:
+  scaleTargetRef:
+    name: log-processing-service
+  minReplicaCount: 4
+  maxReplicaCount: 48
+  cooldownPeriod: 300 # scale-down stabilization window per Part 10.3
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka-broker:9092
+        consumerGroup: log-processing-service
+        topic: otel.logs.raw
+        lagThreshold: "1000"
+        activationLagThreshold: "100"

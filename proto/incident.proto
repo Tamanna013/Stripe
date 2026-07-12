@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package flowguard.incident.v1;
+
+option go_package = "flowguard/proto/incident";
+
+service IncidentService {
+  rpc ReportIncident (ReportIncidentRequest) returns (ReportIncidentResponse);
+  rpc UpdateIncidentStatus (UpdateIncidentStatusRequest) returns (Incident);
+  rpc GetIncident (GetIncidentRequest) returns (Incident);
+}
+
+message Incident {
+  string id = 1;
+  string display_id = 2;
+  string title = 3;
+  string status = 4;
+  string severity = 5;
+  string primary_service_id = 6;
+  int64 detected_at_unix_ms = 7;
+  int64 resolved_at_unix_ms = 8;
+  int64 closed_at_unix_ms = 9;
+}
+
+message ReportIncidentRequest {
+  string title = 1;
+  string severity = 2;
+  string primary_service_id = 3;
+  string source_signal_id = 4;
+}
+
+message ReportIncidentResponse {
+  Incident incident = 1;
+}
+
+message UpdateIncidentStatusRequest {
+  string incident_id = 1;
+  string new_status = 2;
+  string updated_by = 3;
+  string idempotency_key = 4;
+}
+
+message GetIncidentRequest {
+  string incident_id = 1;
+}

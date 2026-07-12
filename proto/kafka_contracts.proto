@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package flowguard.kafka.v1;
+
+option go_package = "flowguard/proto/kafka";
+
+// Topic: otel.spans.raw
+message RawSpanEnvelope {
+  string schema_version = 1;
+  string flowguard_request_id = 2;
+  string trace_id = 3;
+  string span_id = 4;
+  string parent_span_id = 5;
+  string service_name = 6;
+  string operation_name = 7;
+  int64 start_time_unix_nano = 8;
+  int64 end_time_unix_nano = 9;
+  map<string, string> attributes = 10;
+  string status = 11;
+}
+
+// Topic: traces.completed
+message CompletedTraceSummary {
+  string trace_id = 1;
+  string root_service = 2;
+  string root_operation = 3;
+  int64 duration_ms = 4;
+  bool has_error = 5;
+  repeated string services_involved = 6;
+  int32 span_count = 7;
+  bool is_partial = 8; // true if correlation window expired before completion signal
+}
+
+// Topic: incident.state.changed
+message IncidentStateChanged {
+  string incident_id = 1;
+  string previous_state = 2;
+  string new_state = 3;
+  int64 changed_at_unix_ms = 4;
+  string changed_by = 5; // "system" | user id
+  string idempotency_key = 6;
+}
+
+// Topic: log.anomaly.detected
+message LogAnomalyDetected {
+  string service_name = 1;
+  string log_level = 2;
+  double baseline_rate_per_min = 3;
+  double observed_rate_per_min = 4;
+  double deviation_score = 5;
+  int64 window_start_unix_ms = 6;
+  int64 window_end_unix_ms = 7;
+}

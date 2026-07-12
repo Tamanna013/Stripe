@@ -1,0 +1,29 @@
+# Multi-stage build for Python AI services
+FROM python:3.12-slim AS builder
+
+ARG SERVICE_NAME
+
+WORKDIR /src
+COPY services/${SERVICE_NAME}/requirements.txt .
+
+# Create virtualenv and install dependencies
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir -r requirements.txt
+
+FROM python:3.12-slim AS runtime
+
+ARG SERVICE_NAME
+
+# Copy the virtualenv from the builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /app
+COPY services/${SERVICE_NAME} .
+
+# Run as non-root
+RUN useradd -m nonroot
+USER nonroot
+
+ENTRYPOINT ["python", "main.py"]

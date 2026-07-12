@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingestion-gw
+  labels:
+    app: ingestion-gw
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ingestion-gw
+  template:
+    metadata:
+      labels:
+        app: ingestion-gw
+      annotations:
+        sidecar.istio.io/inject: "true" # mTLS sidecar per Part 4.3
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: ingestion-gw
+          image: flowguard/ingestion-gateway:latest # OPA will enforce SHAs instead of latest in Prod
+          ports:
+            - containerPort: 50051
+            - containerPort: 8081 # Health port
+          resources:
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi" # CPU bound service per Part 10.2
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingestion-gw
+spec:
+  selector:
+    app: ingestion-gw
+  ports:
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ingestion-gw-pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: ingestion-gw

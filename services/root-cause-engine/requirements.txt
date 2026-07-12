@@ -1,0 +1,6 @@
+grpcio>=1.60.0
+grpcio-tools>=1.60.0
+langgraph>=0.0.26
+langchain>=0.1.0
+langchain-openai>=0.0.2
+pydantic>=2.5.0
