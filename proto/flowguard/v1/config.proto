@@ -1,0 +1,36 @@
+syntax = "proto3";
+package flowguard.v1;
+option go_package = "github.com/flowguard/protos/gen/go/flowguard/v1;flowguardv1";
+
+service Config {
+  rpc GetConfig(GetConfigRequest) returns (ConfigValue);
+  rpc WatchConfig(WatchConfigRequest) returns (stream ConfigValue);
+  rpc SetConfig(SetConfigRequest) returns (SetConfigResponse);
+}
+
+message GetConfigRequest {
+  string key = 1;
+}
+
+message ConfigValue {
+  string key = 1;
+  string value_json = 2;
+  int32 version = 3;
+  string updated_by = 4;
+  int64 updated_at_unix_ms = 5;
+}
+
+message WatchConfigRequest {
+  string key_prefix = 1;
+}
+
+message SetConfigRequest {
+  string key = 1;
+  string value_json = 2;
+  string updated_by = 3;
+}
+
+message SetConfigResponse {
+  bool success = 1;
+  int32 new_version = 2;
+}

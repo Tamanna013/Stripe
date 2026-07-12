@@ -1,0 +1,61 @@
+syntax = "proto3";
+package flowguard.v1;
+option go_package = "github.com/flowguard/protos/gen/go/flowguard/v1;flowguardv1";
+
+import "google/protobuf/timestamp.proto";
+
+service Auth {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+  rpc GetJWKS(GetJWKSRequest) returns (GetJWKSResponse);
+  rpc IssueServiceCert(IssueServiceCertRequest) returns (ServiceCert);
+}
+
+message LoginRequest {
+  string oidc_code = 1;
+  string redirect_uri = 2;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  int64 expires_in_seconds = 3;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string access_token = 1;
+  int64 expires_in_seconds = 2;
+}
+
+message ValidateTokenRequest {
+  string access_token = 1;
+}
+
+message ValidateTokenResponse {
+  bool valid = 1;
+  string subject = 2;
+  string email = 3;
+  repeated string roles = 4;
+  string invalid_reason = 5;
+}
+
+message GetJWKSRequest {}
+
+message GetJWKSResponse {
+  string jwks_json = 1;
+}
+
+message IssueServiceCertRequest {
+  string spiffe_id = 1;
+  bytes csr_der = 2;
+}
+
+message ServiceCert {
+  bytes cert_der = 1;
+  google.protobuf.Timestamp expires_at = 2;
+}

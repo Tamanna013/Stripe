@@ -1,0 +1,9 @@
+go 1.23
+
+use (
+	./pkg
+	./proto/gen/go
+	./services/auth-service
+	./services/config-service
+	./services/ingestion-gw
+)

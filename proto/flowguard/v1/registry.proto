@@ -1,0 +1,35 @@
+syntax = "proto3";
+package flowguard.v1;
+option go_package = "github.com/flowguard/protos/gen/go/flowguard/v1;flowguardv1";
+
+service Registry {
+  rpc RegisterService(RegisterServiceRequest) returns (ServiceRecord);
+  rpc GetService(GetServiceRequest) returns (ServiceRecord);
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse);
+}
+
+message RegisterServiceRequest {
+  string name = 1;
+  string team = 2;
+  string repo_url = 3;
+}
+
+message ServiceRecord {
+  string id = 1;
+  string name = 2;
+  string team = 3;
+  string repo_url = 4;
+  int64 registered_at_unix_ms = 5;
+}
+
+message GetServiceRequest {
+  string name = 1;
+}
+
+message ListServicesRequest {
+  string team_filter = 1;
+}
+
+message ListServicesResponse {
+  repeated ServiceRecord services = 1;
+}
